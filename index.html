@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SpotVibes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-900">
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-4 border-b shadow-sm">
+    <div class="flex items-center space-x-4">
+      <img src="src/images/Spot_Vibes_Logo_without_Text.png" alt="Logo" class="h-8">
+      <nav class="hidden md:flex space-x-6 text-sm font-medium">
+        <a href="#" class="border-b-2 border-black pb-1">Homes</a>
+        <a href="#" class="text-gray-500">Experiences</a>
+        <a href="#" class="text-gray-500">Services</a>
+      </nav>
+    </div>
+    <div class="flex items-center space-x-4">
+      <button onclick="redirectToHost()" class="text-sm font-medium hover:underline">Become a host</button>
+      <button onclick="redirectToSignUp()" class="text-sm font-medium hover:underline">Sign Up</button>
+      <button class="w-9 h-9 rounded-full hover:bg-gray-100">
+        🌐
+      </button>
+      <button class="w-9 h-9 rounded-full hover:bg-gray-100">
+        ☰
+      </button>
+    </div>
+  </header>
+
+  <!-- Search Bar -->
+  <section class="flex justify-center mt-6">
+    <div class="flex w-full max-w-4xl rounded-full shadow-md border px-6 py-3 space-x-4 items-center">
+      <input type="text" placeholder="Where" class="w-1/4 outline-none" />
+      <input type="date" class="w-1/4 outline-none" />
+      <input type="date" class="w-1/4 outline-none" />
+      <input type="text" placeholder="Add guests" class="w-1/4 outline-none" />
+      <button class="bg-red-500 text-white p-2 rounded-full">
+        🔍
+      </button>
+    </div>
+  </section>
+
+  <!-- Listings -->
+  <main class="px-6 py-10 space-y-10">
+    <!-- Popular homes -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Popular homes in Paris &rarr;</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Example card -->
+        <div class="rounded-lg overflow-hidden shadow hover:shadow-md transition">
+          <img src="src/images/MisibisBayResort.jpg" alt="Room" class="w-full h-48 object-cover">
+          <div class="p-4">
+            <div class="text-sm text-gray-500">Room in Notre Dame</div>
+            <div class="text-sm font-medium">₱10,370 for 2 nights • ★4.93</div>
+          </div>
+        </div>
+        <!-- Repeat similar cards with different data or dynamically using JS -->
+      </div>
+    </section>
+
+    <!-- Stay in London -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Stay in London &rarr;</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="rounded-lg overflow-hidden shadow hover:shadow-md transition">
+          <img src="src/images/coolwaves.webp" alt="Room" class="w-full h-48 object-cover">
+          <div class="p-4">
+            <div class="text-sm text-gray-500">Room in London</div>
+            <div class="text-sm font-medium">₱7,333 for 2 nights • ★4.75</div>
+          </div>
+        </div>
+        <!-- More cards -->
+      </div>
+    </section>
+  </main>
+
+  <script src="index.js"></script>
+</body>
+</html>

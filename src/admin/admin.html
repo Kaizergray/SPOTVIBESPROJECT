@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="bg-blue-50 text-gray-800">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-900 text-white flex flex-col justify-between shadow-md">
+      <div>
+        <h2 class="text-2xl font-bold p-6">Admin Panel</h2>
+        <nav class="space-y-1 px-4">
+          <button onclick="showTab('dashboard')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+            <i class="ph ph-gauge"></i> Dashboard
+          </button>
+          <button onclick="showTab('users')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+            <i class="ph ph-users"></i> Created Users
+          </button>
+          <button onclick="showTab('owners')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+            <i class="ph ph-briefcase"></i> Resort Owners
+          </button>
+          <button onclick="showTab('resorts')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+            <i class="ph ph-buildings"></i> Manage Listings
+          </button>
+          <button onclick="showTab('logs')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+            <i class="ph ph-clipboard-text"></i> Activity Logs
+          </button>
+        </nav>
+      </div>
+      <div class="p-4">
+        <button id="logoutbtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Log Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 space-y-6">
+      <h1 class="text-3xl font-semibold text-blue-900 mb-6">Welcome Admin</h1>
+
+      <!-- Dashboard Overview -->
+      <section id="dashboard" class="tab-section">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-blue-900 mb-2">Total Users</h3>
+            <p class="text-3xl font-bold">154</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-blue-900 mb-2">Total Owners</h3>
+            <p class="text-3xl font-bold">37</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-blue-900 mb-2">Pending Resorts</h3>
+            <p class="text-3xl font-bold">12</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Users Section -->
+      <section id="users" class="tab-section hidden">
+        <p class="text-lg">Users section coming soon...</p>
+      </section>
+
+      <!-- Owners Section -->
+      <section id="owners" class="tab-section hidden">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Resort Owners</h2>
+          <table class="min-w-full text-sm">
+            <thead class="bg-blue-100">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold">ID</th>
+                <th class="px-6 py-3 text-left font-semibold">Username</th>
+                <th class="px-6 py-3 text-left font-semibold">Email</th>
+                <th class="px-6 py-3 text-left font-semibold">Created Date</th>
+                <th class="px-6 py-3 text-left font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t">
+                <td class="px-6 py-4">1</td>
+                <td class="px-6 py-4">owner123</td>
+                <td class="px-6 py-4">owner123@example.com</td>
+                <td class="px-6 py-4">2025-05-10</td>
+                <td class="px-6 py-4">
+                  <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Delete</button>
+                </td>
+              </tr>
+              <!-- Additional owner rows can go here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Resorts Section -->
+      <section id="resorts" class="tab-section hidden">
+        <p class="text-lg">Resorts section coming soon...</p>
+      </section>
+
+      <!-- Logs Section -->
+      <section id="logs" class="tab-section hidden">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Activity Logs</h2>
+          <ul class="divide-y divide-gray-200 text-sm">
+            <li class="px-6 py-3">[2025-05-16] Admin deleted user neo4</li>
+            <li class="px-6 py-3">[2025-05-15] Owner bob@resorts.com registered</li>
+            <li class="px-6 py-3">[2025-05-14] Resort listing #101 submitted</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
