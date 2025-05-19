@@ -7,6 +7,10 @@ import {
   GoogleAuthProvider, signInWithPopup
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
 
+import {
+  getFirestore, collection, doc, addDoc, setDoc, getDocs
+} from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
+
 // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyAch_Ph5WnosCD9gLXeeXorQGwck4_mQqs",
@@ -23,6 +27,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
 
 function showAlert(message) {
   const alertBox = document.getElementById("alertbox");
@@ -41,8 +47,9 @@ document.getElementById("signupbutton")?.addEventListener("click", async (e) => 
   const password = document.getElementById("spassword").value;
   const confirmPassword = document.getElementById("sconfirmpassword").value;
   const username = document.getElementById("susername").value;
+  const contact = document.getElementById("scontact").value;
 
-  if (!email || !password || !confirmPassword || !username) {
+  if (!email || !password || !confirmPassword || !username || !contact) {
     return showAlert("Please fill in all fields to Sign Up");
   }
   if (password !== confirmPassword) {
@@ -50,17 +57,39 @@ document.getElementById("signupbutton")?.addEventListener("click", async (e) => 
   }
 
   document.getElementById("signtext").textContent = "Signing up...";
+
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(userCredential.user, { displayName: username });
+    const user = userCredential.user;
+
+    await updateProfile(user, { displayName: username });
+
+    // 🔥 Firestore: Get current count for incremental ID
+    const usersCollection = collection(db, "resortOwners");
+    const snapshot = await getDocs(usersCollection);
+    const newId = snapshot.size + 1;
+
+    const creationDate = new Date().toISOString(); // or use `user.metadata.creationTime`
+
+    await setDoc(doc(db, "resortOwners", user.uid), {
+      uid: user.uid,
+      email: user.email,
+      username: username,
+      contact: contact,
+      createdAt: creationDate,
+      resortOwnerId: newId
+    });
+
     document.getElementById("signform").reset();
     showAlert(`Signup successful! Welcome, ${username}`);
   } catch (error) {
     console.error("Signup error:", error);
     showAlert(`Signup failed: ${error.message}`);
   }
+
   document.getElementById("signtext").textContent = "Sign Up";
 });
+
 
 // Login
 document.getElementById("loginbutton")?.addEventListener("click", async (e) => {
