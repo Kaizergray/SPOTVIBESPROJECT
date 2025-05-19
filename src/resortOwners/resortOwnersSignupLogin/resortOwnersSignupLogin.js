@@ -76,8 +76,7 @@ document.getElementById("signupbutton")?.addEventListener("click", async (e) => 
       email: user.email,
       username: username,
       contact: contact,
-      createdAt: creationDate,
-      resortOwnerId: newId
+      createdAt: creationDate
     });
 
     document.getElementById("signform").reset();
