@@ -4,6 +4,6 @@
     }
 
     function redirectToSignUp() {
-      window.location.href = 'user_signup.html'; // Change to your user sign up page
+      window.location.href = 'src/users/userSignUpLogin/userSignupLogin.html'; // Change to your user sign up page
     }
   

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login & Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-cover bg-center min-h-screen flex flex-col" style="background-image: url('')">
+  <main class="flex-grow flex items-center justify-center py-8">
+    <div class="w-full max-w-md space-y-6">
+
+      <!-- Become a Host Heading -->
+      <div class="text-center">
+        <h1 class="text-3xl font-semibold text-gray-800">Welcome to SpotVibes</h1>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginform" class="bg-white shadow-lg rounded-2xl p-6">
+        <h2 class="text-2xl font-bold text-center text-blue-600 mb-2">Login</h2>
+        <p class="text-sm text-center mb-4">
+          Don't have an account?
+          <span id="signup" class="text-blue-500 underline cursor-pointer">Sign Up</span>
+        </p>
+        <form class="space-y-4">
+          <input type="email" id="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg" />
+          <div class="relative">
+            <input type="password" id="password" placeholder="Password" class="w-full px-4 py-2 border rounded-lg" />
+            <button type="button" id="togglePassword" class="absolute top-2 right-3 text-sm text-gray-500">Show</button>
+          </div>
+          <button type="button" id="loginbutton" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            <span id="logtext">Login</span>
+          </button>
+        </form>
+        <div class="my-4 text-center">
+          <p class="text-sm text-gray-600 mb-2">or</p>
+          <button id="googleSignIn" class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 flex items-center justify-center gap-2">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google icon" />
+            Sign in with Google
+          </button>
+          <div class="text-center mt-6">
+            <a href="../../../index.html"
+              class="inline-block px-6 py-2 text-sm font-medium text-blue-600 hover:text-white border border-blue-600 rounded-full hover:bg-blue-600 transition-all duration-200">
+              ← Back to Landing
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signup Form -->
+      <div id="signupform" class="bg-white shadow-lg rounded-2xl p-6 hidden">
+        <h2 class="text-2xl font-bold text-center text-green-600 mb-2">Sign Up</h2>
+        <p class="text-sm text-center mb-4">
+          Already have an account?
+          <span id="login" class="text-green-500 underline cursor-pointer">Login</span>
+        </p>
+        <form class="space-y-4" id="signform">
+          <input type="text" id="susername" placeholder="Username" class="w-full px-4 py-2 border rounded-lg" />
+          <input type="email" id="semail" placeholder="Email" class="w-full px-4 py-2 border rounded-lg" />
+          <div class="relative">
+            <input type="password" id="spassword" placeholder="Password" class="w-full px-4 py-2 border rounded-lg" />
+            <button type="button" id="toggleSignPassword" class="absolute top-2 right-3 text-sm text-gray-500">Show</button>
+          </div>
+          <div class="relative">
+            <input type="password" id="sconfirmpassword" placeholder="Confirm Password" class="w-full px-4 py-2 border rounded-lg" />
+            <button type="button" id="toggleConfirmPassword" class="absolute top-2 right-3 text-sm text-gray-500">Show</button>
+          </div>
+          <button type="button" id="signupbutton" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+            <span id="signtext">Sign Up</span>
+          </button>
+        </form>
+        <div class="text-center mt-6">
+          <a href="../../../index.html"
+            class="inline-block px-6 py-2 text-sm font-medium text-blue-600 hover:text-white border border-blue-600 rounded-full hover:bg-blue-600 transition-all duration-200">
+            ← Back to Landing
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Profile Section -->
+      <div id="profilesection" class="hidden bg-white shadow-md rounded-2xl p-6 text-center space-y-4">
+        <div>
+          <h2 id="profilename" class="text-xl font-medium text-gray-800 mb-1"></h2>
+          <p id="profileemail" class="text-sm text-gray-600"></p>
+          <p id="createddate" class="text-xs text-gray-500"></p>
+        </div>
+
+        <div class="space-y-2">
+          <input type="text" id="newname" placeholder="New Display Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+          <button id="updatename" class="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-700">Update Name</button>
+        </div>
+
+        <div class="space-y-2">
+          <input type="password" id="newpassword" placeholder="New Password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+          <button id="changepassword" class="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-700">Change Password</button>
+        </div>
+
+        <button id="deleteaccount" class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300">Delete Account</button>
+        <button id="logoutbtn" class="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200">Log Out</button>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="alertbox" class="hidden mt-4 p-3 text-white text-center rounded-lg bg-blue-500"></div>
+
+    </div>
+  </main>
+
+  <script type="module" src="userSignupLogin.js"></script>
+</body>
+</html>
