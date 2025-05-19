@@ -4,6 +4,10 @@ import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.7.3/fire
 import {
   getFirestore,
   collection,
+  query,
+  orderBy,
+  limit,
+  startAfter,
   getDocs,
   deleteDoc,
   doc
@@ -25,60 +29,176 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ResortOwners
-async function loadResortOwners() {
-  const tableBody = document.querySelector("#owners table tbody");
-  tableBody.innerHTML = ""; // Clear existing rows
+// Pagination state for Created Users
+let usersPageSize = 10;
+let usersLastVisible = null;
+let usersPrevStack = [null];  // initialize with null to represent first page cursor
+
+// Pagination state for Resort Owners
+let ownersPageSize = 10;
+let ownersLastVisible = null;
+let ownersPrevStack = [null];
+
+// Utility to clear table body and insert rows
+function renderTableRows(tableBody, docs, idField, fields) {
+  tableBody.innerHTML = "";
+  let id = 1;
+
+  docs.forEach(docSnap => {
+    const data = docSnap.data();
+    const tr = document.createElement("tr");
+    tr.classList.add("border-t");
+
+    // Build columns dynamically
+    let cols = `<td class="px-6 py-4">${id++}</td>`;
+    for (const f of fields) {
+      cols += `<td class="px-6 py-4">${data[f] || "N/A"}</td>`;
+    }
+    cols += `<td class="px-6 py-4">
+      <button 
+        class="delete-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" 
+        data-id="${docSnap.id}">
+        Delete
+      </button>
+    </td>`;
+
+    tr.innerHTML = cols;
+    tableBody.appendChild(tr);
+  });
+
+  // Attach delete handlers
+  document.querySelectorAll(".delete-btn").forEach(button => {
+    button.addEventListener("click", async () => {
+      const docId = button.getAttribute("data-id");
+      const confirmDelete = confirm("Are you sure you want to delete this item?");
+      if (!confirmDelete) return;
+
+      try {
+        await deleteDoc(doc(db, idField, docId));
+        alert("Deleted successfully.");
+        button.closest("tr").remove();
+      } catch (error) {
+        console.error("Error deleting document:", error);
+        alert("Failed to delete. Please try again.");
+      }
+    });
+  });
+}
+
+// LOAD Created Users with pagination
+async function loadCreatedUsers(direction = 'next') {
+  const tableBody = document.getElementById("users-table-body");
+  const collRef = collection(db, "Created Users");
+  let q;
+
+  if (direction === 'next') {
+    const lastCursor = usersPrevStack[usersPrevStack.length - 1];
+    if (lastCursor) {
+      q = query(collRef, orderBy("username"), startAfter(lastCursor), limit(usersPageSize));
+    } else {
+      q = query(collRef, orderBy("username"), limit(usersPageSize));
+    }
+  } else if (direction === 'prev') {
+    if (usersPrevStack.length > 1) {
+      usersPrevStack.pop(); // remove current page cursor
+      const prevCursor = usersPrevStack[usersPrevStack.length - 1];
+      if (prevCursor) {
+        q = query(collRef, orderBy("username"), startAfter(prevCursor), limit(usersPageSize));
+      } else {
+        q = query(collRef, orderBy("username"), limit(usersPageSize));
+      }
+    } else {
+      // already at first page
+      alert("You are at the first page.");
+      return;
+    }
+  }
 
   try {
-    const ownersSnapshot = await getDocs(collection(db, "resortOwners"));
-    let id = 1;
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      usersLastVisible = snapshot.docs[snapshot.docs.length - 1];
+      renderTableRows(tableBody, snapshot.docs, "Created Users", ["username", "fullname", "email"]);
 
-    ownersSnapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const tr = document.createElement("tr");
-      tr.classList.add("border-t");
+      // Manage cursor stack
+      if (direction === 'next') {
+        usersPrevStack.push(usersLastVisible);
+      }
 
-      tr.innerHTML = `
-        <td class="px-6 py-4">${id++}</td>
-        <td class="px-6 py-4">${data.username || "N/A"}</td>
-        <td class="px-6 py-4">${data.email || "N/A"}</td>
-        <td class="px-6 py-4">${data.createdAt || "N/A"}</td>
-        <td class="px-6 py-4">${data.contact || "N/A"}</td>
-        <td class="px-6 py-4">
-          <button 
-            class="delete-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" 
-            data-id="${docSnap.id}">
-            Delete
-          </button>
-        </td>
-      `;
-      tableBody.appendChild(tr);
-    });
+      // Disable prev button if at first page
+      document.getElementById("users-prev-btn").disabled = usersPrevStack.length <= 1;
+      // Disable next button if less than page size docs returned (no more pages)
+      document.getElementById("users-next-btn").disabled = snapshot.size < usersPageSize;
 
-    // Attach delete event listeners
-    document.querySelectorAll(".delete-btn").forEach(button => {
-      button.addEventListener("click", async () => {
-        const docId = button.getAttribute("data-id");
-        const confirmDelete = confirm("Are you sure you want to delete this resort owner?");
-        if (!confirmDelete) return;
+    } else {
+      if (direction === 'next') {
+        alert("No more users.");
+        document.getElementById("users-next-btn").disabled = true;
+      }
+    }
+  } catch (error) {
+    console.error("Error loading created users:", error);
+    alert("Failed to load users.");
+  }
+}
 
-        try {
-          await deleteDoc(doc(db, "resortOwners", docId));
-          alert("Resort owner deleted successfully.");
-          button.closest("tr").remove(); // remove the row from the UI
-        } catch (error) {
-          console.error("Error deleting resort owner:", error);
-          alert("Failed to delete resort owner. Please try again.");
-        }
-      });
-    });
+// LOAD Resort Owners with pagination
+async function loadResortOwners(direction = 'next') {
+  const tableBody = document.getElementById("owners-table-body");
+  const collRef = collection(db, "resortOwners");
+  let q;
 
+  if (direction === 'next') {
+    const lastCursor = ownersPrevStack[ownersPrevStack.length - 1];
+    if (lastCursor) {
+      q = query(collRef, orderBy("username"), startAfter(lastCursor), limit(ownersPageSize));
+    } else {
+      q = query(collRef, orderBy("username"), limit(ownersPageSize));
+    }
+  } else if (direction === 'prev') {
+    if (ownersPrevStack.length > 1) {
+      ownersPrevStack.pop();
+      const prevCursor = ownersPrevStack[ownersPrevStack.length - 1];
+      if (prevCursor) {
+        q = query(collRef, orderBy("username"), startAfter(prevCursor), limit(ownersPageSize));
+      } else {
+        q = query(collRef, orderBy("username"), limit(ownersPageSize));
+      }
+    } else {
+      alert("You are at the first page.");
+      return;
+    }
+  }
+
+  try {
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      ownersLastVisible = snapshot.docs[snapshot.docs.length - 1];
+      renderTableRows(tableBody, snapshot.docs, "resortOwners", ["username", "email", "createdAt", "contact"]);
+
+      if (direction === 'next') {
+        ownersPrevStack.push(ownersLastVisible);
+      }
+
+      document.getElementById("owners-prev-btn").disabled = ownersPrevStack.length <= 1;
+      document.getElementById("owners-next-btn").disabled = snapshot.size < ownersPageSize;
+    } else {
+      if (direction === 'next') {
+        alert("No more resort owners.");
+        document.getElementById("owners-next-btn").disabled = true;
+      }
+    }
   } catch (error) {
     console.error("Error loading resort owners:", error);
     alert("Failed to load resort owners.");
   }
 }
+
+// Event listeners for pagination buttons
+document.getElementById("users-next-btn").addEventListener("click", () => loadCreatedUsers('next'));
+document.getElementById("users-prev-btn").addEventListener("click", () => loadCreatedUsers('prev'));
+document.getElementById("owners-next-btn").addEventListener("click", () => loadResortOwners('next'));
+document.getElementById("owners-prev-btn").addEventListener("click", () => loadResortOwners('prev'));
 
 // Logout logic
 document.getElementById("logoutbtn")?.addEventListener("click", async () => {
@@ -100,12 +220,14 @@ function showTab(tabId) {
   const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.innerText.includes(tabId.split("_")[0]));
   if (activeBtn) activeBtn.classList.add('bg-blue-700');
 
-  if (tabId === 'owners') loadResortOwners(); // ⬅️ Load data when tab is clicked
+  if (tabId === 'owners') loadResortOwners();
+  if (tabId === 'users') loadCreatedUsers();
 }
 
 window.showTab = showTab;
 
-// Show default tab on load
+// On page load, show default tab and load users
 window.addEventListener('DOMContentLoaded', () => {
   showTab('dashboard');
+  loadCreatedUsers();
 });

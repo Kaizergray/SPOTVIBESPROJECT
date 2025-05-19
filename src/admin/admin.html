@@ -60,7 +60,30 @@
 
       <!-- Users Section -->
       <section id="users" class="tab-section hidden">
-        <p class="text-lg">Users section coming soon...</p>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Created Users</h2>
+          <table class="min-w-full text-sm">
+            <thead class="bg-blue-100">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold">ID</th>
+                <th class="px-6 py-3 text-left font-semibold">Username</th>
+                <th class="px-6 py-3 text-left font-semibold">Full Name</th>
+                <th class="px-6 py-3 text-left font-semibold">Email</th>
+                <th class="px-6 py-3 text-left font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+
+          <!-- Pagination Controls -->
+          <div class="flex justify-between items-center px-6 py-3 bg-blue-50">
+            <button id="users-prev-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50" disabled>Previous</button>
+            <span id="users-page-info" class="text-sm text-gray-700"></span>
+            <button id="users-next-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Next</button>
+          </div>
+        </div>
       </section>
 
       <!-- Owners Section -->
@@ -68,21 +91,27 @@
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
           <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Resort Owners</h2>
           <table class="min-w-full text-sm">
-          <thead class="bg-blue-100">
-            <tr>
-              <th class="px-6 py-3 text-left font-semibold">ID</th>
-              <th class="px-6 py-3 text-left font-semibold">Username</th>
-              <th class="px-6 py-3 text-left font-semibold">Email</th>
-              <th class="px-6 py-3 text-left font-semibold">Created Date</th>
-              <th class="px-6 py-3 text-left font-semibold">Contact</th>
-              <th class="px-6 py-3 text-left font-semibold">Actions</th>
-            </tr>
-          </thead>
-
-            <tbody>
-              <!-- Additional owner rows can go here -->
+            <thead class="bg-blue-100">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold">ID</th>
+                <th class="px-6 py-3 text-left font-semibold">Username</th>
+                <th class="px-6 py-3 text-left font-semibold">Email</th>
+                <th class="px-6 py-3 text-left font-semibold">Created Date</th>
+                <th class="px-6 py-3 text-left font-semibold">Contact</th>
+                <th class="px-6 py-3 text-left font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="owners-table-body">
+              <!-- Populated by JS -->
             </tbody>
           </table>
+
+          <!-- Pagination Controls -->
+          <div class="flex justify-between items-center px-6 py-3 bg-blue-50">
+            <button id="owners-prev-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50" disabled>Previous</button>
+            <span id="owners-page-info" class="text-sm text-gray-700"></span>
+            <button id="owners-next-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Next</button>
+          </div>
         </div>
       </section>
 
