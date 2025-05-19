@@ -23,6 +23,9 @@
           <button onclick="showTab('owners')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
             <i class="ph ph-briefcase"></i> Resort Owners
           </button>
+          <button onclick="showTab('google_users')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+            <i class="ph ph-google-logo"></i> Google Users
+          </button>
           <button onclick="showTab('resorts')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
             <i class="ph ph-buildings"></i> Manage Listings
           </button>
@@ -76,8 +79,6 @@
               <!-- Populated by JS -->
             </tbody>
           </table>
-
-          <!-- Pagination Controls -->
           <div class="flex justify-between items-center px-6 py-3 bg-blue-50">
             <button id="users-prev-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50" disabled>Previous</button>
             <span id="users-page-info" class="text-sm text-gray-700"></span>
@@ -105,12 +106,36 @@
               <!-- Populated by JS -->
             </tbody>
           </table>
-
-          <!-- Pagination Controls -->
           <div class="flex justify-between items-center px-6 py-3 bg-blue-50">
             <button id="owners-prev-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50" disabled>Previous</button>
             <span id="owners-page-info" class="text-sm text-gray-700"></span>
             <button id="owners-next-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Next</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Google Users Section -->
+      <section id="google_users" class="tab-section hidden">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Google Users</h2>
+          <table class="min-w-full text-sm">
+            <thead class="bg-blue-100">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold">ID</th>
+                <th class="px-6 py-3 text-left font-semibold">Full Name</th>
+                <th class="px-6 py-3 text-left font-semibold">Email</th>
+                <th class="px-6 py-3 text-left font-semibold">User ID</th>
+                <th class="px-6 py-3 text-left font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="google-users-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+          <div class="flex justify-between items-center px-6 py-3 bg-blue-50">
+            <button id="google-users-prev-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50" disabled>Previous</button>
+            <span id="google-users-page-info" class="text-sm text-gray-700"></span>
+            <button id="google-users-next-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Next</button>
           </div>
         </div>
       </section>

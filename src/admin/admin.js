@@ -194,6 +194,65 @@ async function loadResortOwners(direction = 'next') {
   }
 }
 
+
+// Pagination state for Google Users
+let googleUsersPageSize = 10;
+let googleUsersLastVisible = null;
+let googleUsersPrevStack = [null];
+
+async function loadGoogleUsers(direction = 'next') {
+  const tableBody = document.getElementById("google-users-table-body");
+  const collRef = collection(db, "Google Users");
+  let q;
+
+  if (direction === 'next') {
+    const lastCursor = googleUsersPrevStack[googleUsersPrevStack.length - 1];
+    q = lastCursor 
+      ? query(collRef, orderBy("fullname"), startAfter(lastCursor), limit(googleUsersPageSize))
+      : query(collRef, orderBy("fullname"), limit(googleUsersPageSize));
+  } else if (direction === 'prev') {
+    if (googleUsersPrevStack.length > 1) {
+      googleUsersPrevStack.pop();
+      const prevCursor = googleUsersPrevStack[googleUsersPrevStack.length - 1];
+      q = prevCursor
+        ? query(collRef, orderBy("fullname"), startAfter(prevCursor), limit(googleUsersPageSize))
+        : query(collRef, orderBy("fullname"), limit(googleUsersPageSize));
+    } else {
+      alert("You are at the first page.");
+      return;
+    }
+  }
+
+  try {
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      googleUsersLastVisible = snapshot.docs[snapshot.docs.length - 1];
+      renderTableRows(tableBody, snapshot.docs, "Google Users", ["fullname", "email", "userId"]);
+
+      if (direction === 'next') {
+        googleUsersPrevStack.push(googleUsersLastVisible);
+      }
+
+      document.getElementById("google-users-prev-btn").disabled = googleUsersPrevStack.length <= 1;
+      document.getElementById("google-users-next-btn").disabled = snapshot.size < googleUsersPageSize;
+    } else {
+      if (direction === 'next') {
+        alert("No more Google users.");
+        document.getElementById("google-users-next-btn").disabled = true;
+      }
+    }
+  } catch (error) {
+    console.error("Error loading Google Users:", error);
+    alert("Failed to load Google Users.");
+  }
+}
+
+// Pagination buttons
+document.getElementById("google-users-next-btn").addEventListener("click", () => loadGoogleUsers('next'));
+document.getElementById("google-users-prev-btn").addEventListener("click", () => loadGoogleUsers('prev'));
+
+
+
 // Event listeners for pagination buttons
 document.getElementById("users-next-btn").addEventListener("click", () => loadCreatedUsers('next'));
 document.getElementById("users-prev-btn").addEventListener("click", () => loadCreatedUsers('prev'));
@@ -222,7 +281,9 @@ function showTab(tabId) {
 
   if (tabId === 'owners') loadResortOwners();
   if (tabId === 'users') loadCreatedUsers();
+  if (tabId === 'google_users') loadGoogleUsers();
 }
+
 
 window.showTab = showTab;
 
