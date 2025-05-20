@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Post a Resort</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div
+    class="bg-white p-8 rounded-lg shadow-lg w-full max-w-xl hidden"
+    id="uploadForm"
+  >
+    <h2 class="text-2xl font-bold mb-6 text-center">Post Your Resort</h2>
+
+    <div class="space-y-4">
+      <input
+        id="rName"
+        type="text"
+        placeholder="Resort Name"
+        class="w-full border rounded p-2"
+      />
+      <input
+        id="cPerson"
+        type="text"
+        placeholder="Contact Person"
+        class="w-full border rounded p-2"
+      />
+      <input
+        id="cNumber"
+        type="text"
+        placeholder="Contact Number"
+        class="w-full border rounded p-2"
+      />
+      <input
+        id="eMail"
+        type="email"
+        placeholder="Email"
+        class="w-full border rounded p-2"
+      />
+      <textarea
+        id="desc"
+        rows="3"
+        placeholder="Description"
+        class="w-full border rounded p-2"
+      ></textarea>
+      <input
+        id="price"
+        type="text"
+        placeholder="Price"
+        class="w-full border rounded p-2"
+      />
+      <input
+        id="address"
+        type="text"
+        placeholder="Address"
+        class="w-full border rounded p-2"
+      />
+    </div>
+
+    <button
+      id="postResortBtn"
+      class="w-full bg-blue-600 text-white mt-4 py-2 rounded hover:bg-blue-700"
+    >
+      Post Resort
+    </button>
+  </div>
+  <script type="module" src="resortUpload.js" defer></script>
+</body>
+</html>

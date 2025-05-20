@@ -247,10 +247,44 @@ async function loadGoogleUsers(direction = 'next') {
   }
 }
 
+// Resort Listings 
+async function fetchAllResorts() {
+  const tableBody = document.getElementById("resorts-table-body");
+  tableBody.innerHTML = ''; // Clear previous data
+
+  try {
+    const snapshot = await getDocs(collection(db, "Resorts"));
+    if (!snapshot.empty) {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td class="px-6 py-4">
+            <img src="${data.image || ''}" alt="${data.name || ''}" class="w-20 h-16 object-cover rounded-md" />
+          </td>
+          <td class="px-6 py-4">${data.name || 'N/A'}</td>
+          <td class="px-6 py-4">${data.address || 'N/A'}</td>
+          <td class="px-6 py-4">₹${data.price || 0}</td>
+          <td class="px-6 py-4">${data.contact_person || 'N/A'}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    } else {
+      tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No resorts found.</td></tr>`;
+    }
+  } catch (error) {
+    console.error("Error fetching resorts:", error);
+  }
+}
+
+
 // Pagination buttons
 document.getElementById("google-users-next-btn").addEventListener("click", () => loadGoogleUsers('next'));
 document.getElementById("google-users-prev-btn").addEventListener("click", () => loadGoogleUsers('prev'));
-
+// Pagination buttons event listeners
+document.getElementById("resorts-next-btn").addEventListener("click", () => fetchAllResorts('next'));
+document.getElementById("resorts-prev-btn").addEventListener("click", () => fetchAllResorts('prev'));
 
 
 // Event listeners for pagination buttons
@@ -282,6 +316,7 @@ function showTab(tabId) {
   if (tabId === 'owners') loadResortOwners();
   if (tabId === 'users') loadCreatedUsers();
   if (tabId === 'google_users') loadGoogleUsers();
+  if (tabId === 'resorts') fetchAllResorts();
 }
 
 

@@ -140,24 +140,31 @@
         </div>
       </section>
 
-      <!-- Resorts Section -->
-      <section id="resorts" class="tab-section hidden">
-        <p class="text-lg">Resorts section coming soon...</p>
-      </section>
-
-      <!-- Logs Section -->
-      <section id="logs" class="tab-section hidden">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-          <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Activity Logs</h2>
-          <ul class="divide-y divide-gray-200 text-sm">
-            <li class="px-6 py-3">[2025-05-16] Admin deleted user neo4</li>
-            <li class="px-6 py-3">[2025-05-15] Owner bob@resorts.com registered</li>
-            <li class="px-6 py-3">[2025-05-14] Resort listing #101 submitted</li>
-          </ul>
-        </div>
-      </section>
-    </main>
+<!-- Resorts Section -->
+<section id="resorts" class="tab-section hidden">
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Resorts</h2>
+    <table class="min-w-full text-sm">
+      <thead class="bg-blue-100">
+        <tr>
+          <th class="px-6 py-3 text-left font-semibold">Image</th>
+          <th class="px-6 py-3 text-left font-semibold">Name</th>
+          <th class="px-6 py-3 text-left font-semibold">Address</th>
+          <th class="px-6 py-3 text-left font-semibold">Price</th>
+          <th class="px-6 py-3 text-left font-semibold">Contact Person</th>
+        </tr>
+      </thead>
+      <tbody id="resorts-table-body" class="divide-y divide-gray-200">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+    <div class="flex justify-between items-center px-6 py-3 bg-blue-50">
+      <button id="resorts-prev-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50" disabled>Previous</button>
+      <span id="resorts-page-info" class="text-sm text-gray-700"></span>
+      <button id="resorts-next-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Next</button>
+    </div>
   </div>
+</section>
 
   <script type="module" src="admin.js"></script>
 </body>
