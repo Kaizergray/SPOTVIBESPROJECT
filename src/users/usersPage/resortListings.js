@@ -5,14 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
 
 // Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAch_Ph5WnosCD9gLXeeXorQGwck4_mQqs",
-  authDomain: "spot-vibes.firebaseapp.com",
-  projectId: "spot-vibes",
-  storageBucket: "spot-vibes.appspot.com",
-  messagingSenderId: "815189643743",
-  appId: "1:815189643743:web:a7e571964f43c73b17f46a"
-};
+import {firebaseConfig} from "../../firebase/firebaseConfig.js"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
