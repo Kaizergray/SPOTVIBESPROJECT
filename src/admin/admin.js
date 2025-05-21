@@ -253,7 +253,7 @@ async function fetchAllResorts() {
   tableBody.innerHTML = ''; // Clear previous data
 
   try {
-    const snapshot = await getDocs(collection(db, "Resorts"));
+    const snapshot = await getDocs(collection(db, "Pending Resorts"));
     if (!snapshot.empty) {
       snapshot.forEach(doc => {
         const data = doc.data();
