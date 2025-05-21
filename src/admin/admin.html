@@ -26,9 +26,12 @@
           <button onclick="showTab('google_users')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
             <i class="ph ph-google-logo"></i> Google Users
           </button>
-          <button onclick="showTab('resorts')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+          <button onclick="showTab('pendingResorts')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
             <i class="ph ph-buildings"></i> Manage Listings
           </button>
+          <button onclick="showTab('Resorts')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
+            <i class="ph ph-buildings"></i> Resorts
+          </button>          
           <button onclick="showTab('logs')" class="tab-btn w-full text-left flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-800 transition">
             <i class="ph ph-clipboard-text"></i> Activity Logs
           </button>
@@ -140,8 +143,34 @@
         </div>
       </section>
 
-<!-- Manage Resort Listings Section -->
-<section id="resorts" class="tab-section hidden">
+<!-- Manage Pending Resorts Listings Section -->
+<section id="pendingResorts" class="tab-section hidden">
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Pending Resorts</h2>
+    <table class="min-w-full text-sm">
+      <thead class="bg-blue-100">
+        <tr>
+          <th class="px-6 py-3 text-left font-semibold">Image</th>
+          <th class="px-6 py-3 text-left font-semibold">Name</th>
+          <th class="px-6 py-3 text-left font-semibold">Address</th>
+          <th class="px-6 py-3 text-left font-semibold">Price</th>
+          <th class="px-6 py-3 text-left font-semibold">Contact Person</th>
+        </tr>
+      </thead>
+      <tbody id="pending-resorts-table-body" class="divide-y divide-gray-200">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+    <div class="flex justify-between items-center px-6 py-3 bg-blue-50">
+      <button id="pending-resorts-prev-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50" disabled>Previous</button>
+      <span id="pending-resorts-page-info" class="text-sm text-gray-700"></span>
+      <button id="pending-resorts-next-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Next</button>
+    </div>
+  </div>
+</section>
+
+<!-- Approved Resorts Listings Section -->
+<section id="Resorts" class="tab-section hidden">
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <h2 class="bg-blue-800 text-white text-lg font-semibold px-6 py-3">Resorts</h2>
     <table class="min-w-full text-sm">
@@ -165,6 +194,7 @@
     </div>
   </div>
 </section>
+
 
   <script type="module" src="admin.js"></script>
 </body>

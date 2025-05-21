@@ -9,6 +9,8 @@ import {
   limit,
   startAfter,
   getDocs,
+  getDoc,
+  setDoc,
   deleteDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
@@ -247,16 +249,85 @@ async function loadGoogleUsers(direction = 'next') {
   }
 }
 
-// Resort Listings 
-async function fetchAllResorts() {
-  const tableBody = document.getElementById("resorts-table-body");
-  tableBody.innerHTML = ''; // Clear previous data
+// Fetch Pending Resorts
+async function fetchPendingResorts() {
+  const tableBody = document.getElementById("pending-resorts-table-body");
+  tableBody.innerHTML = '';
 
   try {
     const snapshot = await getDocs(collection(db, "Pending Resorts"));
     if (!snapshot.empty) {
-      snapshot.forEach(doc => {
-        const data = doc.data();
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const row = document.createElement("tr");
+        row.dataset.id = docSnap.id; // Store ID for event delegation
+
+        row.innerHTML = `
+          <td class="px-6 py-4">
+            <img src="${data.image || ''}" alt="${data.name || ''}" class="w-20 h-16 object-cover rounded-md" />
+          </td>
+          <td class="px-6 py-4">${data.name || 'N/A'}</td>
+          <td class="px-6 py-4">${data.address || 'N/A'}</td>
+          <td class="px-6 py-4">₹${data.price || 0}</td>
+          <td class="px-6 py-4">${data.contact_person || 'N/A'}</td>
+          <td class="px-6 py-4">
+            <button class="approve-btn bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+              Approve
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    } else {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+            No pending resorts found.
+          </td>
+        </tr>`;
+    }
+  } catch (error) {
+    console.error("Error fetching pending resorts:", error);
+  }
+}
+
+// Approve a pending resort
+async function approveResort(resortId) {
+  const pendingRef = doc(db, "Pending Resorts", resortId);
+  const approvedRef = doc(db, "Resorts", resortId);
+
+  try {
+    const pendingSnap = await getDoc(pendingRef);
+
+    if (pendingSnap.exists()) {
+      const data = pendingSnap.data();
+
+      await setDoc(approvedRef, data);       // Move to "Resorts"
+      await deleteDoc(pendingRef);           // Remove from "Pending Resorts"
+
+      alert("Resort approved successfully!");
+
+      fetchPendingResorts(); // Refresh tables
+      fetchApprovedResorts();
+    } else {
+      alert("Resort not found.");
+    }
+  } catch (error) {
+    console.error("Error approving resort:", error);
+    alert("An error occurred while approving.");
+  }
+}
+
+// Fetch Approved Resorts
+async function fetchApprovedResorts() {
+  const tableBody = document.getElementById("resorts-table-body");
+  tableBody.innerHTML = '';
+
+  try {
+    const snapshot = await getDocs(collection(db, "Resorts"));
+    if (!snapshot.empty) {
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
         const row = document.createElement("tr");
 
         row.innerHTML = `
@@ -271,20 +342,43 @@ async function fetchAllResorts() {
         tableBody.appendChild(row);
       });
     } else {
-      tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No resorts found.</td></tr>`;
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+            No approved resorts found.
+          </td>
+        </tr>`;
     }
   } catch (error) {
-    console.error("Error fetching resorts:", error);
+    console.error("Error fetching approved resorts:", error);
   }
 }
+
+// 🧠 Event Delegation for Approve Button
+document.getElementById("pending-resorts-table-body").addEventListener("click", (e) => {
+  if (e.target.classList.contains("approve-btn")) {
+    const row = e.target.closest("tr");
+    const resortId = row?.dataset.id;
+    if (resortId) {
+      approveResort(resortId);
+    }
+  }
+});
+
+// Initial load
+fetchPendingResorts();
+fetchApprovedResorts();
 
 
 // Pagination buttons
 document.getElementById("google-users-next-btn").addEventListener("click", () => loadGoogleUsers('next'));
 document.getElementById("google-users-prev-btn").addEventListener("click", () => loadGoogleUsers('prev'));
 // Pagination buttons event listeners
-document.getElementById("resorts-next-btn").addEventListener("click", () => fetchAllResorts('next'));
-document.getElementById("resorts-prev-btn").addEventListener("click", () => fetchAllResorts('prev'));
+document.getElementById("resorts-next-btn").addEventListener("click", () => fetchApprovedResorts());
+document.getElementById("resorts-prev-btn").addEventListener("click", () => fetchApprovedResorts());
+// Pagination buttons event listeners
+document.getElementById("pending-resorts-next-btn").addEventListener("click", () => fetchPendingResorts());
+document.getElementById("pending-resorts-prev-btn").addEventListener("click", () => fetchPendingResorts());
 
 
 // Event listeners for pagination buttons
@@ -316,7 +410,8 @@ function showTab(tabId) {
   if (tabId === 'owners') loadResortOwners();
   if (tabId === 'users') loadCreatedUsers();
   if (tabId === 'google_users') loadGoogleUsers();
-  if (tabId === 'resorts') fetchAllResorts();
+  if (tabId === 'pendingResorts') fetchPendingResorts();
+  if (tabId === 'Resorts') fetchApprovedResorts();
 }
 
 
