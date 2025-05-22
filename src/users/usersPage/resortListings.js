@@ -5,21 +5,20 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
 
 // Firebase config
-import {firebaseConfig} from "../../firebase/firebaseConfig.js"
+import { firebaseConfig } from "../../firebase/firebaseConfig.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let selectedResort = null;
+let allResorts = []; // Stores all resorts for search filtering
 
-// Load resorts
-async function loadResorts() {
+// Display resorts in the UI
+function displayResorts(resorts) {
   const container = document.getElementById("resortsContainer");
-  const snapshot = await getDocs(collection(db, "Resorts"));
-  snapshot.forEach(doc => {
-    const resort = doc.data();
-    resort.id = doc.id;
+  container.innerHTML = ""; // Clear existing content
 
+  resorts.forEach(resort => {
     const card = document.createElement("div");
     card.className = "rounded-lg overflow-hidden shadow hover:shadow-md transition cursor-pointer";
     card.innerHTML = `
@@ -29,11 +28,33 @@ async function loadResorts() {
         <div class="text-sm font-medium">₱${resort.price || 'N/A'} • ${resort.name}</div>
       </div>
     `;
-
     card.onclick = () => showModal(resort);
     container.appendChild(card);
   });
 }
+
+// Load resorts from Firestore
+async function loadResorts() {
+  const snapshot = await getDocs(collection(db, "Resorts"));
+  allResorts = []; // Reset
+
+  snapshot.forEach(doc => {
+    const resort = doc.data();
+    resort.id = doc.id;
+    allResorts.push(resort);
+  });
+
+  displayResorts(allResorts);
+}
+
+// Filter resorts by search input
+window.filterResortsByName = function (searchTerm) {
+  const term = searchTerm.toLowerCase().trim();
+  const filtered = allResorts.filter(resort =>
+    resort.name && resort.name.toLowerCase().includes(term)
+  );
+  displayResorts(filtered);
+};
 
 // Show resort modal
 function showModal(resort) {
@@ -87,3 +108,11 @@ document.getElementById("bookingForm").addEventListener("submit", async (e) => {
 });
 
 loadResorts();
+
+// --- New code to support Enter key for search ---
+document.getElementById("searchInput").addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); // prevent form submission or default behavior
+    filterResortsByName(this.value);
+  }
+});

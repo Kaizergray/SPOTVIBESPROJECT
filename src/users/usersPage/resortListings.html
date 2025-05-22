@@ -30,16 +30,24 @@
     </div>
   </header>
 
-  <!-- Search Bar -->
-  <section class="flex justify-center mt-6">
-    <div class="flex w-full max-w-4xl rounded-full shadow-md border px-6 py-3 space-x-4 items-center">
-      <input type="text" placeholder="Where" class="w-1/4 outline-none" />
-      <input type="date" class="w-1/4 outline-none" />
-      <input type="date" class="w-1/4 outline-none" />
-      <input type="text" placeholder="Add guests" class="w-1/4 outline-none" />
-      <button class="bg-red-500 text-white p-2 rounded-full">🔍</button>
-    </div>
-  </section>
+<!-- Search Bar -->
+<section class="flex justify-center mt-6">
+  <div class="flex w-full max-w-4xl rounded-full shadow-md border px-6 py-3 space-x-4 items-center">
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Where"
+      class="flex-grow outline-none"
+    />
+    <button
+      onclick="filterResortsByName(document.getElementById('searchInput').value)"
+      class="bg-red-500 text-white p-2 rounded-full"
+    >
+      🔍
+    </button>
+  </div>
+</section>
+
 
   <!-- Listings Section -->
   <main class="px-6 py-10 space-y-10">
