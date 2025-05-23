@@ -3,12 +3,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  onAuthStateChanged, signOut, updateProfile, updatePassword, deleteUser,
+  onAuthStateChanged, signOut, updateProfile,
   GoogleAuthProvider, signInWithPopup
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
 
 import {
-  getFirestore, collection, doc, addDoc, setDoc, getDocs
+  getFirestore, collection, doc, setDoc, getDocs
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
 
 // Firebase config
@@ -19,7 +19,6 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
-
 
 function showAlert(message) {
   const alertBox = document.getElementById("alertbox");
@@ -54,19 +53,16 @@ document.getElementById("signupbutton")?.addEventListener("click", async (e) => 
 
     await updateProfile(user, { displayName: username });
 
-    // 🔥 Firestore: Get current count for incremental ID
     const usersCollection = collection(db, "Created Users");
     const snapshot = await getDocs(usersCollection);
     const newId = snapshot.size + 1;
 
-    const creationDate = new Date().toISOString(); // or use `user.metadata.creationTime`
-
-  await setDoc(doc(db, "Created Users", user.uid), {
-    fullname: username, // matching Android's "fullname"
-    username: username,
-    email: email,
-    userId: user.uid
-  });
+    await setDoc(doc(db, "Created Users", user.uid), {
+      fullname: username,
+      username: username,
+      email: email,
+      userId: user.uid
+    });
 
     document.getElementById("signform").reset();
     showAlert(`Signup successful! Welcome, ${username}`);
@@ -77,7 +73,6 @@ document.getElementById("signupbutton")?.addEventListener("click", async (e) => 
 
   document.getElementById("signtext").textContent = "Sign Up";
 });
-
 
 // Login
 document.getElementById("loginbutton")?.addEventListener("click", async (e) => {
@@ -107,7 +102,6 @@ document.getElementById("googleSignIn")?.addEventListener("click", async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    // Save Google user data to Firestore
     await setDoc(doc(db, "Google Users", user.uid), {
       email: user.email,
       userId: user.uid,
@@ -119,80 +113,6 @@ document.getElementById("googleSignIn")?.addEventListener("click", async () => {
   } catch (error) {
     console.error("Google login error:", error);
     showAlert(`Google login failed: ${error.message}`);
-  }
-});
-
-// Auth Observer
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    document.getElementById("loginform")?.classList.add("hidden");
-    document.getElementById("signupform")?.classList.add("hidden");
-    document.getElementById("profilesection")?.classList.remove("hidden");
-
-    document.getElementById("profilename").textContent = user.displayName || "No Name";
-    document.getElementById("profileemail").textContent = user.email;
-    const createdDate = new Date(user.metadata.creationTime).toLocaleString();
-    document.getElementById("createddate").textContent = `Joined: ${createdDate}`;
-  } else {
-    document.getElementById("profilesection")?.classList.add("hidden");
-    document.getElementById("loginform")?.classList.remove("hidden");
-  }
-});
-
-// Update Display Name
-document.getElementById("updatename")?.addEventListener("click", async () => {
-  const newName = document.getElementById("newname").value.trim();
-  if (!newName) return showAlert("Display name cannot be empty.");
-
-  try {
-    await updateProfile(auth.currentUser, { displayName: newName });
-    document.getElementById("profilename").textContent = newName;
-    document.getElementById("newname").value = "";
-    showAlert("Display name updated.");
-  } catch (error) {
-    console.error("Update name error:", error);
-    showAlert("Failed to update name.");
-  }
-});
-
-// Change Password
-document.getElementById("changepassword")?.addEventListener("click", async () => {
-  const newPass = document.getElementById("newpassword").value;
-  if (!newPass || newPass.length < 6) {
-    return showAlert("Password must be at least 6 characters.");
-  }
-
-  try {
-    await updatePassword(auth.currentUser, newPass);
-    document.getElementById("newpassword").value = "";
-    showAlert("Password changed successfully.");
-  } catch (error) {
-    console.error("Password change error:", error);
-    showAlert("Failed to change password.");
-  }
-});
-
-// Delete Account
-document.getElementById("deleteaccount")?.addEventListener("click", async () => {
-  if (confirm("Are you sure you want to delete your account? This cannot be undone.")) {
-    try {
-      await deleteUser(auth.currentUser);
-      showAlert("Account deleted.");
-    } catch (error) {
-      console.error("Delete account error:", error);
-      showAlert("Account deletion failed. Try re-logging in.");
-    }
-  }
-});
-
-// Logout
-document.getElementById("logoutbtn")?.addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-    showAlert("Logged out successfully.");
-  } catch (error) {
-    console.error("Logout error:", error);
-    showAlert("Logout failed!");
   }
 });
 

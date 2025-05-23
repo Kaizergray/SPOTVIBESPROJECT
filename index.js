@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
 
 // Firebase config
-import {firebaseConfig} from "./src/firebase/firebaseConfig.js"
+import { firebaseConfig } from "./src/firebase/firebaseConfig.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -21,6 +21,22 @@ let currentUser = null;
 // Monitor auth state
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
+
+  const profileLink = document.getElementById("profileLink");
+  const signupLink = document.getElementById("signupLink");
+  const hostLink = document.getElementById("hostLink");
+
+  if (user) {
+    // User is logged in
+    profileLink.classList.remove("hidden");
+    signupLink.classList.add("hidden");
+    hostLink.classList.add("hidden");
+  } else {
+    // User is not logged in
+    profileLink.classList.add("hidden");
+    signupLink.classList.remove("hidden");
+    hostLink.classList.remove("hidden");
+  }
 });
 
 // Display resorts
