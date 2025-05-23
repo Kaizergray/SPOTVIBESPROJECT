@@ -102,7 +102,7 @@ document.getElementById("loginbutton")?.addEventListener("click", async (e) => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     showAlert("Login successful! Redirecting...");
-    setTimeout(() => window.location.href = "../../../index.html", 1500);
+    setTimeout(() => window.location.href = "../resortOwnersPage/resortOwner.html", 1500);
   } catch (error) {
     console.error("Login error:", error);
     showAlert(`Login failed: ${error.message}`);
@@ -115,7 +115,7 @@ document.getElementById("googleSignIn")?.addEventListener("click", async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     showAlert(`Google login successful! Welcome ${result.user.displayName}`);
-    setTimeout(() => window.location.href = "../../../index.html", 1500);
+    setTimeout(() => window.location.href = "../resortOwnersPage/resortOwner.html", 1500);
   } catch (error) {
     console.error("Google login error:", error);
     showAlert(`Google login failed: ${error.message}`);

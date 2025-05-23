@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resort Owner Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md flex flex-col justify-between p-5">
+      <div>
+        <h2 class="text-2xl font-bold text-blue-600 mb-8">Owner Panel</h2>
+        <nav class="space-y-4">
+          <a href="#" data-tab="resorts" class="tab-link block text-gray-700 hover:text-blue-600 font-medium">🏖️ Posted Resorts</a>
+          <a href="#" data-tab="bookings" class="tab-link block text-gray-700 hover:text-blue-600 font-medium">📆 Booking Requests</a>
+        </nav>
+      </div>
+      <!-- Logout Button -->
+      <button id="logoutBtn" class="mt-8 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">
+        🚪 Logout
+      </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h1 class="text-3xl font-bold mb-6">Welcome, Resort Owner!</h1>
+
+      <!-- Posted Resorts Section -->
+      <section id="resortsTab" class="tab-section">
+        <h2 class="text-2xl font-semibold mb-4">📌 Posted Resorts</h2>
+        <div id="postedResorts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Dynamic resort cards will appear here -->
+        </div>
+      </section>
+
+      <!-- Booking Requests Section -->
+      <section id="bookingsTab" class="tab-section hidden">
+        <h2 class="text-2xl font-semibold mb-4">📅 Booking Requests</h2>
+        <div id="bookingRequests" class="space-y-4">
+          <!-- Dynamic booking cards will appear here -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Your JS module -->
+  <script type="module" src="resortOwner.js"></script>
+</body>
+</html>
