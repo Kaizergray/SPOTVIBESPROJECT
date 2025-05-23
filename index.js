@@ -8,16 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
 
 // Firebase config
-export const firebaseConfig = {
-  apiKey: "AIzaSyAch_Ph5WnosCD9gLXeeXorQGwck4_mQqs",
-  authDomain: "spot-vibes.firebaseapp.com",
-  databaseURL: "https://spot-vibes-default-rtdb.firebaseio.com",
-  projectId: "spot-vibes",
-  storageBucket: "spot-vibes.appspot.com",
-  messagingSenderId: "815189643743",
-  appId: "1:815189643743:web:a7e571964f43c73b17f46a",
-  measurementId: "G-3926TGFZJX"
-};
+import {firebaseConfig} from "./src/firebase/firebaseConfig.js"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
