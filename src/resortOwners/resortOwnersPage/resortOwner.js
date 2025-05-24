@@ -1,114 +1,138 @@
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { firebaseConfig } from "../../firebase/firebaseConfig.js";
 
-// Your Firebase config
-import {firebaseConfig} from "../../firebase/firebaseConfig.js"
-
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Logout function
+// Logout
 document.getElementById("logoutBtn").addEventListener("click", () => {
   signOut(auth)
     .then(() => {
-      window.location.href = "../../../index.html"; // Redirect after logout
+      window.location.href = "../../../index.html";
     })
     .catch((error) => {
       console.error("Logout error:", error);
     });
 });
 
-
-const resorts = [
-  { name: "Sunny Beach Resort", location: "Palawan", image: "https://via.placeholder.com/300x200" },
-  { name: "Mountain View Resort", location: "Baguio", image: "https://via.placeholder.com/300x200" },
-];
-
-const bookings = [
-  {
-    customerName: "Juan Dela Cruz",
-    resort: "Sunny Beach Resort",
-    checkIn: "2025-06-10",
-    checkOut: "2025-06-12"
-  },
-  {
-    customerName: "Maria Clara",
-    resort: "Mountain View Resort",
-    checkIn: "2025-07-01",
-    checkOut: "2025-07-03"
-  }
-];
-
-function loadPostedResorts() {
+// Load resorts posted by the logged-in user (using UID)
+async function loadPostedResorts(user) {
   const container = document.getElementById("postedResorts");
   container.innerHTML = "";
-  resorts.forEach((resort) => {
-    const card = document.createElement("div");
-    card.className = "bg-white shadow rounded-lg overflow-hidden";
-    card.innerHTML = `
-      <img src="${resort.image}" alt="${resort.name}" class="w-full h-40 object-cover" />
-      <div class="p-4">
-        <h3 class="text-lg font-bold">${resort.name}</h3>
-        <p class="text-gray-600">${resort.location}</p>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+
+  try {
+    const resortsRef = collection(db, "Resorts");
+    const querySnapshot = await getDocs(resortsRef);
+
+    const resorts = querySnapshot.docs
+      .map(doc => doc.data())
+      .filter(resort => resort["created by"] === user.uid);
+
+    if (resorts.length === 0) {
+      container.innerHTML = `<p class="text-gray-500">No resorts posted yet.</p>`;
+      return;
+    }
+
+    resorts.forEach((resort) => {
+      const card = document.createElement("div");
+      card.className = "bg-white shadow rounded-lg overflow-hidden";
+      card.innerHTML = `
+        <img src="${resort.image || 'https://via.placeholder.com/300x200'}" alt="${resort.name}" class="w-full h-40 object-cover" />
+        <div class="p-4">
+          <h3 class="text-lg font-bold">${resort.name}</h3>
+          <p class="text-gray-600">${resort.address || 'No address provided'}</p>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Error loading resorts:", error);
+    container.innerHTML = `<p class="text-red-500">Error loading resorts.</p>`;
+  }
 }
 
-function loadBookingRequests() {
+// ✅ Load Booking Requests from: Pending Bookings → [user.uid] → Waiting for Confirmation
+async function loadBookingRequests(user) {
   const container = document.getElementById("bookingRequests");
   container.innerHTML = "";
-  bookings.forEach((booking, index) => {
-    const card = document.createElement("div");
-    card.className = "bg-white p-4 shadow rounded-md";
-    card.innerHTML = `
-      <h3 class="text-lg font-semibold">${booking.customerName}</h3>
-      <p class="text-sm text-gray-600">Resort: ${booking.resort}</p>
-      <p class="text-sm text-gray-600">Check-in: ${booking.checkIn}</p>
-      <p class="text-sm text-gray-600">Check-out: ${booking.checkOut}</p>
-      <div class="mt-4 flex space-x-3">
-        <button class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600" onclick="acceptBooking(${index})">Accept</button>
-        <button class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600" onclick="rejectBooking(${index})">Reject</button>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+
+  try {
+    const waitingRef = collection(db, "Pending Bookings", user.uid, "Waiting for Confirmation");
+    const snapshot = await getDocs(waitingRef);
+
+    if (snapshot.empty) {
+      container.innerHTML = `<p class="text-gray-500">No pending booking requests.</p>`;
+      return;
+    }
+
+    snapshot.forEach((doc) => {
+      const booking = doc.data();
+
+      const card = document.createElement("div");
+      card.className = "bg-white p-4 shadow rounded-md";
+      card.innerHTML = `
+        <h3 class="text-lg font-semibold">${booking["Customer Name"] || "Unknown Customer"}</h3>
+        <p class="text-sm text-gray-600">Resort: ${booking["Resort Name"] || "N/A"}</p>
+        <p class="text-sm text-gray-600">Check-in: ${booking["Check In"] ? new Date(booking["Check In"]).toLocaleDateString() : "N/A"}</p>
+        <p class="text-sm text-gray-600">Check-out: ${booking["Check Out"] ? new Date(booking["Check Out"]).toLocaleDateString() : "N/A"}</p>
+        <p class="text-sm text-gray-600">Booking Type: ${booking["Booking Type"] || "N/A"}</p>
+        <p class="text-sm text-gray-600">Price: ₱${booking["Price"] !== undefined ? booking["Price"] : "N/A"}</p>
+        <p class="text-sm text-blue-500">Status: Pending Confirmation</p>
+        <div class="mt-4 flex space-x-3">
+          <button class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600">Accept</button>
+          <button class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600">Reject</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Error loading booking requests:", error);
+    container.innerHTML = `<p class="text-red-500">Failed to load booking requests.</p>`;
+  }
 }
 
-function acceptBooking(index) {
-  alert(`Accepted booking for ${bookings[index].customerName}`);
-}
-
-function rejectBooking(index) {
-  alert(`Rejected booking for ${bookings[index].customerName}`);
-}
-
-function setupTabs() {
+// Tab Switching
+function setupTabs(user) {
   const links = document.querySelectorAll(".tab-link");
   const sections = document.querySelectorAll(".tab-section");
 
-  links.forEach(link => {
+  links.forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       const target = link.dataset.tab;
 
-      // Hide all sections
-      sections.forEach(sec => sec.classList.add("hidden"));
+      sections.forEach((section) => section.classList.add("hidden"));
+      links.forEach((l) => l.classList.remove("text-blue-600", "font-bold"));
 
-      // Remove active styles
-      links.forEach(l => l.classList.remove("text-blue-600", "font-bold"));
-
-      // Show selected tab section
       document.getElementById(`${target}Tab`).classList.remove("hidden");
-
-      // Highlight the active link
       link.classList.add("text-blue-600", "font-bold");
+
+      if (target === "bookings") {
+        loadBookingRequests(user);
+      }
     });
   });
 }
 
-// Initial load
-loadPostedResorts();
-loadBookingRequests();
-setupTabs();
+// Auth Listener
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadPostedResorts(user);
+    setupTabs(user);
+  } else {
+    window.location.href = "../../../index.html";
+  }
+});

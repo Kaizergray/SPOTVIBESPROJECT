@@ -258,7 +258,7 @@ async function fetchPendingResorts() {
           </td>
           <td class="px-6 py-4">${data.name || 'N/A'}</td>
           <td class="px-6 py-4">${data.address || 'N/A'}</td>
-          <td class="px-6 py-4">₹${data.price || 0}</td>
+          <td class="px-6 py-4">₱${data.price || 0}</td>
           <td class="px-6 py-4">${data.contact_person || 'N/A'}</td>
           <td class="px-6 py-4">
             <button class="approve-btn bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
@@ -326,7 +326,7 @@ async function fetchApprovedResorts() {
           </td>
           <td class="px-6 py-4">${data.name || 'N/A'}</td>
           <td class="px-6 py-4">${data.address || 'N/A'}</td>
-          <td class="px-6 py-4">₹${data.price || 0}</td>
+          <td class="px-6 py-4">₱${data.price || 0}</td>
           <td class="px-6 py-4">${data.contact_person || 'N/A'}</td>
         `;
         tableBody.appendChild(row);
