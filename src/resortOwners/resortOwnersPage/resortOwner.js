@@ -7,8 +7,13 @@ import {
 import {
   getFirestore,
   collection,
+  collectionGroup,
+  getDocs,
   doc,
-  getDocs
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { firebaseConfig } from "../../firebase/firebaseConfig.js";
 
@@ -28,7 +33,7 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
     });
 });
 
-// Load resorts posted by the logged-in user (using UID)
+// Load resorts posted by the logged-in user
 async function loadPostedResorts(user) {
   const container = document.getElementById("postedResorts");
   container.innerHTML = "";
@@ -64,7 +69,11 @@ async function loadPostedResorts(user) {
   }
 }
 
-// ✅ Load Booking Requests from: Pending Bookings → [user.uid] → Waiting for Confirmation
+// Load Booking Requests
+let currentPage = 1;
+const bookingsPerPage = 3;
+let allBookings = [];
+
 async function loadBookingRequests(user) {
   const container = document.getElementById("bookingRequests");
   container.innerHTML = "";
@@ -78,31 +87,131 @@ async function loadBookingRequests(user) {
       return;
     }
 
-    snapshot.forEach((doc) => {
-      const booking = doc.data();
+    // Store all bookings for pagination
+    allBookings = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+    renderBookingPage(currentPage, user);
 
-      const card = document.createElement("div");
-      card.className = "bg-white p-4 shadow rounded-md";
-      card.innerHTML = `
-        <h3 class="text-lg font-semibold">${booking["Customer Name"] || "Unknown Customer"}</h3>
-        <p class="text-sm text-gray-600">Resort: ${booking["Resort Name"] || "N/A"}</p>
-        <p class="text-sm text-gray-600">Check-in: ${booking["Check In"] ? new Date(booking["Check In"]).toLocaleDateString() : "N/A"}</p>
-        <p class="text-sm text-gray-600">Check-out: ${booking["Check Out"] ? new Date(booking["Check Out"]).toLocaleDateString() : "N/A"}</p>
-        <p class="text-sm text-gray-600">Booking Type: ${booking["Booking Type"] || "N/A"}</p>
-        <p class="text-sm text-gray-600">Price: ₱${booking["Price"] !== undefined ? booking["Price"] : "N/A"}</p>
-        <p class="text-sm text-blue-500">Status: Pending Confirmation</p>
-        <div class="mt-4 flex space-x-3">
-          <button class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600">Accept</button>
-          <button class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600">Reject</button>
-        </div>
-      `;
-      container.appendChild(card);
-    });
   } catch (error) {
-    console.error("Error loading booking requests:", error);
+    console.error("❌ Error loading booking requests:", error);
     container.innerHTML = `<p class="text-red-500">Failed to load booking requests.</p>`;
   }
 }
+
+function renderBookingPage(page, user) {
+  const container = document.getElementById("bookingRequests");
+  container.innerHTML = "";
+
+  const start = (page - 1) * bookingsPerPage;
+  const end = start + bookingsPerPage;
+  const bookingsToShow = allBookings.slice(start, end);
+
+  if (bookingsToShow.length === 0) {
+    container.innerHTML = `<p class="text-gray-500">No booking requests on this page.</p>`;
+    return;
+  }
+
+  bookingsToShow.forEach(({ id, data: booking }) => {
+    const card = document.createElement("div");
+    card.className = "bg-white p-4 shadow rounded-md mb-4";
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold">${booking["Customer Name"] || "Unknown Customer"}</h3>
+      <p class="text-sm text-gray-600">Resort: ${booking["Resort Name"] || "N/A"}</p>
+      <p class="text-sm text-gray-600">Check-in: ${booking["Check In"] ? booking["Check In"].toDate().toLocaleString() : "N/A"}</p>
+      <p class="text-sm text-gray-600">Check-out: ${booking["Check Out"] ? booking["Check Out"].toDate().toLocaleString() : "N/A"}</p>
+      <p class="text-sm text-gray-600">Booking Type: ${booking["Booking Type"] || "N/A"}</p>
+      <p class="text-sm text-gray-600">Price: ₱${booking["Price"] !== undefined ? booking["Price"] : "N/A"}</p>
+      <p class="statusText text-sm text-blue-500">Status: ${booking["Status"] || "Pending Confirmation"}</p>
+      <div class="mt-4 flex space-x-3 button-container">
+        <button class="acceptBtn bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600" data-id="${id}">Accept</button>
+        <button class="rejectBtn bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600" data-id="${id}">Reject</button>
+      </div>
+    `;
+    container.appendChild(card);
+
+    // Hide buttons if already confirmed
+    if (booking["Status"] === "Confirmed") {
+      card.querySelector(".button-container").style.display = "none";
+    }
+
+    // Accept Button
+    card.querySelector(".acceptBtn").addEventListener("click", async () => {
+      try {
+        const bookingRef = doc(db, "Pending Bookings", user.uid, "Waiting for Confirmation", id);
+        const resortId = booking["Resort Id"];
+        if (!resortId) return alert("❌ Resort ID missing. Cannot confirm booking.");
+
+        const updatedBooking = { ...booking, Status: "Confirmed" };
+        const confirmedRef = doc(db, "Bookings", resortId, "Confirmed Booking", id);
+        await setDoc(confirmedRef, updatedBooking);
+        await updateDoc(bookingRef, { Status: "Confirmed" });
+
+        const invoiceQuery = query(collectionGroup(db, "User Invoices"));
+        const invoiceSnapshot = await getDocs(invoiceQuery);
+        for (const invoice of invoiceSnapshot.docs) {
+          if (invoice.id === id) {
+            await updateDoc(invoice.ref, { Status: "Confirmed" });
+            break;
+          }
+        }
+
+        card.querySelector(".statusText").textContent = "Status: Confirmed";
+        card.querySelector(".statusText").classList.replace("text-blue-500", "text-green-600");
+        card.querySelector(".button-container").style.display = "none";
+        alert("✅ Booking confirmed!");
+      } catch (err) {
+        console.error("❌ Confirm error:", err);
+        alert("Failed to confirm booking.");
+      }
+    });
+
+    // Reject Button
+    card.querySelector(".rejectBtn").addEventListener("click", async () => {
+      try {
+        const invoiceRef = doc(db, "Invoices", "Invoices", "User Invoices", "User Invoices", id);
+        await setDoc(invoiceRef, { ...booking, Status: "Rejected", "Time Issued": new Date().toISOString() });
+        await deleteDoc(doc(db, "Pending Bookings", user.uid, "Waiting for Confirmation", id));
+        card.remove();
+        alert("❌ Booking rejected.");
+      } catch (err) {
+        console.error("❌ Reject error:", err);
+        alert("Failed to reject booking.");
+      }
+    });
+  });
+
+  // Pagination Controls
+  const totalPages = Math.ceil(allBookings.length / bookingsPerPage);
+  const paginationDiv = document.createElement("div");
+  paginationDiv.className = "flex justify-between items-center mt-4";
+
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "⏪ Previous";
+  prevBtn.className = "px-4 py-1 bg-gray-300 rounded disabled:opacity-50";
+  prevBtn.disabled = page === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderBookingPage(currentPage, user);
+    }
+  });
+
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Next ⏩";
+  nextBtn.className = "px-4 py-1 bg-gray-300 rounded disabled:opacity-50";
+  nextBtn.disabled = page === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderBookingPage(currentPage, user);
+    }
+  });
+
+  paginationDiv.appendChild(prevBtn);
+  paginationDiv.appendChild(document.createTextNode(`Page ${page} of ${totalPages}`));
+  paginationDiv.appendChild(nextBtn);
+  container.appendChild(paginationDiv);
+}
+
 
 // Tab Switching
 function setupTabs(user) {
